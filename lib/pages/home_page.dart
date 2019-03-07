@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../config/httpHeaders.dart';
-
 class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   String showText='还没有请求数据';
   @override
@@ -17,37 +15,34 @@ class _HomePageState extends State<HomePage> {
            child: Column(
              children: <Widget>[
                RaisedButton(
-                 onPressed: _jike,
+                 onPressed: _juejin,
                  child: Text('请求数据'),
                ),
                Text(showText)
              ],
            ),
          ),
-       )
+       ),
     );
   }
-
-  void _jike(){
-    print('开始向极客时间请求数据……');
+  void _juejin(){
+    print('开始向极客时间请求数据..................');
     getHttp().then((val){
-      setState((){
-          showText = val['data'].toString();
+      setState(() {
+       showText=val['data'].toString();
       });
     });
   }
-
-  Future getHttp() async{
-    try {
+  Future getHttp()async{
+    try{
       Response response;
       Dio dio = new Dio();
-      dio.options.headers=httpHeaders;
-      response =await dio.get('https://time.geekbang.org/serv/v1/column/newAll');
+      dio.options.headers= httpHeaders;
+      response =await dio.get("https://time.geekbang.org/serv/v1/column/newAll");
       print(response);
       return response.data;
-    } catch (e) {
-      return print('Error==================>:$e');
+    }catch(e){
+      return print(e);
     }
   }
-
 }
