@@ -1,79 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import '../config/httpHeaders.dart';
 
 class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController typeController = TextEditingController();
-  String showText = '欢迎你来到这儿';
-
+  String showText='还没有请求数据';
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text('迷宫'),
-            ),
-            body: SingleChildScrollView(
-              child: Container(
-                height: 1000,
-                child: Column(
-                  children: <Widget>[
-                    TextField(
-                      controller: typeController,
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(10.0),
-                          labelText: '玩伴类型',
-                          helperText: '请输入你喜欢的类型'),
-                      //避免键盘自动弹出而出现奇怪的效果
-                      autofocus: false,
-                    ),
-                    RaisedButton(
-                      onPressed: _choiceAction,
-                      child: Text('提交'),
-                    ),
-                    Text(
-                      showText,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    )
-                  ],
-                ),
-              ),
-            )));
+       child: Scaffold(
+         appBar: AppBar(title: Text('请求远程数据'),),
+         body: SingleChildScrollView(
+           child: Column(
+             children: <Widget>[
+               RaisedButton(
+                 onPressed: _jike,
+                 child: Text('请求数据'),
+               ),
+               Text(showText)
+             ],
+           ),
+         ),
+       )
+    );
   }
 
-  void _choiceAction() {
-    print('开始选择你喜欢的类型……');
-    //如果输入为空，就没有必要调用http请求
-    if (typeController.text.toString() == '') {
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: Text('玩伴类型不能为空'),
-              ));
-    } else {
-      getHttp(typeController.text.toString()).then((val) {
-        setState(() {
-          showText = val['data']['name'].toString();
-        });
+  void _jike(){
+    print('开始向极客时间请求数据……');
+    getHttp().then((val){
+      setState((){
+          showText = val['data'].toString();
       });
-    }
+    });
   }
 
-  //返回值为一个Future,这个对象支持一个等待回掉方法then
-  Future getHttp(String typeText) async {
+  Future getHttp() async{
     try {
       Response response;
-      var data = {'name': typeText};
-      response = await Dio().post(
-          "https://www.easy-mock.com/mock/5c7fcd5c8cfae820245a9a5a/example/flutter_shop",
-          queryParameters: data);
+      Dio dio = new Dio();
+      dio.options.headers=httpHeaders;
+      response =await dio.get('https://time.geekbang.org/serv/v1/column/newAll');
+      print(response);
       return response.data;
     } catch (e) {
-      return print(e);
+      return print('Error==================>:$e');
     }
   }
+
 }
